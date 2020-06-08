@@ -54,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
             pokemonUl.append(createPokemon(pokemon))
         })
 
-        console.log(pokemonUl)
         return pokemonUl.innerHTML
     }
 
@@ -67,6 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 //render the new pokemon, append it to the ul
 
 
+    // Delete a pokemon
+        // under the click event listener, do an "else if" click on release
+        // fetch delete
+
     document.addEventListener('click', (e) => {
         if (e.target.textContent === "Add Pokemon"){
             const trainerCard = e.target.parentNode
@@ -74,7 +77,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const teamSize = ul.childElementCount
             if (teamSize === 6) { 
                 window.alert ("Your Team is Full")
-            } else {
+            } 
+            
+            else {
                 fetch(POKEMONS_URL, {
                     method: "POST",
                     headers: {
@@ -87,19 +92,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 })
                 .then(resp => resp.json())
                 .then(json => createPokemon(json))
-                .then(li => appendPokemon(li))
+                .then(li => ul.appendChild(li))
             }
-
-            function appendPokemon(li){
-                ul.appendChild(li)
-            }
-            
-
-            console.dir(ul)
         }
 
-        
+        else if (e.target.className === "release") {
+            const pokemonLi = e.target.parentNode
+            const id = e.target.dataset.pokemonId
 
+            fetch(`${POKEMONS_URL}/${id}`, {
+                method: "DELETE"
+            })
+            .then(pokemonLi.remove())
+        }
         
     })
 
