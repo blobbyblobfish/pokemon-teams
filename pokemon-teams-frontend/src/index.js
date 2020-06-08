@@ -30,26 +30,81 @@ document.addEventListener("DOMContentLoaded", () => {
         trainerDiv.dataset.id = `${trainer.id}`
         trainerDiv.innerHTML = `
         <p>${trainer.name}</p>
-        <button data-trainer-id="1">Add Pokemon</button>
+        <button data-trainer-id="${trainer.id}">Add Pokemon</button>
         <ul> ${unpackPokemons(trainer.pokemons)}</ul>
         `
         trainerContainer.append(trainerDiv)
     }
 
+    function createPokemon(pokemonObj) {
+        const pokemonLi = document.createElement("li")
+        pokemonLi.innerHTML = `
+        ${pokemonObj.nickname} (${pokemonObj.species}) <button class="release" data-pokemon-id="${pokemonObj.id}">Release</button>
+        `
+        
+        return pokemonLi
+    }
+
+     
+
     function unpackPokemons(pokemons) {
         const pokemonUl = document.createElement("ul")
         
         pokemons.forEach(pokemon => {
-            const pokemonLi = document.createElement("li")
-            pokemonLi.innerHTML = `
-            ${pokemon.nickname} (${pokemon.species}) <button class="release" data-pokemon-id="${pokemon.id}">Release</button>
-            `
-            pokemonUl.append(pokemonLi)
+            pokemonUl.append(createPokemon(pokemon))
         })
 
         console.log(pokemonUl)
         return pokemonUl.innerHTML
     }
 
+
+    //Add a pokemon to the db, and show it under the trainer
+        //click listener to add pokemon button
+        //count if the trainer has 6 or more pokemons
+            // if yes, show error
+            // if no, post fetch for a new pokemon
+                //render the new pokemon, append it to the ul
+
+
+    document.addEventListener('click', (e) => {
+        if (e.target.textContent === "Add Pokemon"){
+            const trainerCard = e.target.parentNode
+            const ul = trainerCard.querySelector("ul")
+            const teamSize = ul.childElementCount
+            if (teamSize === 6) { 
+                window.alert ("Your Team is Full")
+            } else {
+                fetch(POKEMONS_URL, {
+                    method: "POST",
+                    headers: {
+                        "content-type": "application/json", 
+                        "accept": "application/json"
+                    }, body: JSON.stringify({
+                        "trainer_id": `${trainerCard.dataset.id}`
+                    })
+                
+                })
+                .then(resp => resp.json())
+                .then(json => createPokemon(json))
+                .then(li => appendPokemon(li))
+            }
+
+            function appendPokemon(li){
+                ul.appendChild(li)
+            }
+            
+
+            console.dir(ul)
+        }
+
+        
+
+        
+    })
+
+    
+
+     
 })
 
